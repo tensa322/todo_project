@@ -1,0 +1,22 @@
+/*CREATE TODO*/
+.create-todo {
+    display: flex;
+    flex-direction: column;
+    row-gap: 8px;
+
+    margin-bottom: 16px;
+}
+
+input {
+    -webkit-appearance: none;
+
+    width: 100%;
+    border: none;
+    background-color: #fff;
+
+    border-radius: 8px;
+
+    padding: 8px 4px;
+
+    color: black;
+}

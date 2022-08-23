@@ -1,0 +1,53 @@
+/*TODO ITEM*/
+.todo-item {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    column-gap: 16px;
+}
+
+/*TODO CONTENT*/
+.todo-content {
+    position: relative;
+    cursor: pointer;
+    padding: 20px 10px;
+
+    width: 400px;
+   
+}
+.is-completed {
+   text-decoration: line-through;
+}
+.todo-title {
+    font-size: 22px;
+    line-height: 26px;
+
+    margin-bottom: 8px;
+}
+
+.todo-description {
+    font-size: 16px;
+    line-height: 20px;
+}
+
+.todo-created-at {
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
+
+    opacity: 0.8;
+
+    font-size: 12px;
+    line-height: 16px;
+}
+
+/*TODO CONTORLS*/
+.control {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    cursor: pointer;
+
+    margin-bottom: 16px;
+}
