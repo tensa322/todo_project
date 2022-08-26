@@ -1,152 +1,172 @@
-import { useState } from 'react'
+import { useState, useEffect, KeyboardEvent } from 'react'
 import './App.css'
-import {Todo, TodoItem} from "./components/todo/TodoItem";
-import {TodoForm, TodoPayload} from "./components/todo-form/TodoForm";
+import { Todo, TodoItem } from "./components/todo/TodoItem";
+import { TodoForm, TodoPayload } from "./components/todo-form/TodoForm";
 
 export type ActiveTodo = number | null
 
 function App() {
-  const [activeTodo, setActiveTodo] = useState<ActiveTodo>(null)
+   const [activeTodo, setActiveTodo] = useState<ActiveTodo>(null)
 
-  const [todoForm, setTodoForm] = useState<TodoPayload>({
-    title: '',
-    description: ''
-  })
-
-  const [todos, setTodos] = useState<Todo[]>([
-    {
-      title: 'Продукты',
-      description: 'Нужны сходить в магазин за продуктами',
-      isCompleted: false,
-      createdAt: new Date()
-    },
-    {
-      title: 'Зал',
-      description: 'Сегодня день ног, не вздумай проебать',
-      isCompleted: false,
-      createdAt: new Date()
-    },
-  ])
-
-  function clearForm() {
-    setTodoForm({
+   const [todoForm, setTodoForm] = useState<TodoPayload>({
       title: '',
       description: ''
-    })
-  }
+   })
 
-  function createTodo(todoForm: TodoPayload) {
-    const newTodo: Todo = {
-      ...todoForm,
-      isCompleted: false,
-      createdAt: new Date()
-    }
+   const [todos, setTodos] = useState<Todo[]>([
+      {
+         title: 'Продукты',
+         description: 'Нужны сходить в магазин за продуктами',
+         isCompleted: false,
+         createdAt: new Date()
+      },
+      {
+         title: 'Зал',
+         description: 'Сегодня день ног, не вздумай проебать',
+         isCompleted: false,
+         createdAt: new Date()
+      },
+   ])
+   
+   // useEffect(() => {
+   //    if (localStorage.getItem('localtasks')) {
+   //       const storedList = JSON.parse(localStorage.getItem('localtasks')!);
+   //       setTodos(storedList)
+   //    }
+   // }, [])
 
-    setTodos([
-      ...todos,
-      newTodo
-    ])
+   function clearForm() {
+      setTodoForm({
+         title: '',
+         description: ''
+      })
+   }
 
-    clearForm()
-  }
-
-  function updateTodo(todoForm: TodoPayload) {
-    if (activeTodo !== null) {
-      const existingTodo = todos[activeTodo]
-
-      const updatedTodo = {
-        ...existingTodo,
-        ...todoForm
+   function createTodo(todoForm: TodoPayload) {
+      const newTodo: Todo = {
+         ...todoForm,
+         isCompleted: false,
+         createdAt: new Date()
       }
 
-      const updatedTodos = [...todos]
+      setTodos([
+         ...todos,
+         newTodo
+      ])
 
-      updatedTodos[activeTodo] = updatedTodo
-
-      setTodos(updatedTodos)
-
-      setActiveTodo(null)
       clearForm()
-    }
-  }
+      // localStorage.setItem('localtasks', JSON.stringify([...todos, newTodo]))
+      // setTodos([])
+   }
 
-  function removeTodo(index: number) {
-    const newTodos = todos.filter((todo, todoIndex) => {
-      return index !== todoIndex
-    })
+   function updateTodo(todoForm: TodoPayload) {
+      if (activeTodo !== null) {
+         const existingTodo = todos[activeTodo]
 
-    setTodos(newTodos)
-  }
+         const updatedTodo = {
+            ...existingTodo,
+            ...todoForm
+         }
 
-  function enterEditMode(index: number) {
-    const todoItem = todos[index]
+         const updatedTodos = [...todos]
 
-    setActiveTodo(index)
+         updatedTodos[activeTodo] = updatedTodo
 
-    setTodoForm({
-      title: todoItem.title,
-      description: todoItem.description
-    })
-  }
+         setTodos(updatedTodos)
 
-  function submitTodo() {
-    activeTodo === null ? createTodo(todoForm) : updateTodo(todoForm)
-  }
+         setActiveTodo(null)
+         clearForm()
+      }
+   }
 
-  function toggleTodo( index:number, isCompleted:boolean ) {
-   const existingTodo = todos[index]
-   const updatedTodo = {...existingTodo, isCompleted}
-   const todosCopy = [...todos]
-   todosCopy[index] = updatedTodo
-   setTodos(todosCopy)
-}
+   function removeTodo(index: number) {
+      const newTodos = todos.filter((todo, todoIndex) => {
+         return index !== todoIndex
+      })
 
-   function completedTodos () {
+      setTodos(newTodos)
+      // localStorage.setItem('localtasks', JSON.stringify(newTodos))
+   }
+
+
+
+   function enterEditMode(index: number) {
+      const todoItem = todos[index]
+
+      setActiveTodo(index)
+
+      setTodoForm({
+         title: todoItem.title,
+         description: todoItem.description
+      })
+   }
+
+   function submitTodo() {
+      activeTodo === null ? createTodo(todoForm) : updateTodo(todoForm)
+   }
+
+   function toggleTodo(index: number, isCompleted: boolean) {
+      const existingTodo = todos[index]
+      const updatedTodo = { ...existingTodo, isCompleted }
+      const todosCopy = [...todos]
+      todosCopy[index] = updatedTodo
+      setTodos(todosCopy)
+   }
+
+   function completedTodos() {
       return todos.filter(todo => todo.isCompleted)
    }
-   function incompletedTodos () {
-      return todos.filter(todo => !todo.isCompleted)}
+   function incompletedTodos() {
+      return todos.filter(todo => !todo.isCompleted)
+   }
 
-  return (
-    <div className="App">
-      <TodoForm
-        todoForm={todoForm}
-        activeTodo={activeTodo}
-        setActiveTodo={setActiveTodo}
-        setTodoForm={setTodoForm}
-        submitTodo={submitTodo}
-        clearForm={clearForm}
-      />
-<div className='todo-list-container'>
-      <div className="todo-list">
-        {incompletedTodos().map((todo, index) => {
-          return (
-            <TodoItem 
-              todo={todo}
-              index={index}
-              removeTodo={removeTodo}
-              enterEditMode={enterEditMode}
-              toggleTodo={toggleTodo}
-            />
-          )
-        })}
+   const onKeyDown = (e:KeyboardEvent<HTMLInputElement>) => {
+    if (e.keyCode === 13)
+   return submitTodo()
+   }
+
+   return (
+      <div className="App">
+         <TodoForm
+            todoForm={todoForm}
+            activeTodo={activeTodo}
+            setActiveTodo={setActiveTodo}
+            setTodoForm={setTodoForm}
+            submitTodo={submitTodo}
+            clearForm={clearForm}
+            onKeyDown={onKeyDown}
+
+         />
+         <div className='todo-list-container'>
+            <div className="todo-list">
+               {incompletedTodos().map((todo, index) => {
+                  return (
+                     <TodoItem
+                        todo={todo}
+                        index={index}
+                        removeTodo={removeTodo}
+                        enterEditMode={enterEditMode}
+                        toggleTodo={toggleTodo}
+                     />
+                  )
+               })}
+            </div>
+            <div className="todo-list">
+               {completedTodos().map((todo, index) => {
+                  return (
+                     <TodoItem
+                        todo={todo}
+                        index={index}
+                        removeTodo={removeTodo}
+                        enterEditMode={enterEditMode}
+                        toggleTodo={toggleTodo}
+                     />
+                  )
+               })}
+            </div>
+         </div>
       </div>
-      <div className="todo-list">
-        {completedTodos().map((todo, index) => {
-          return (
-            <TodoItem 
-              todo={todo}
-              index={index}
-              removeTodo={removeTodo}
-              enterEditMode={enterEditMode}
-              toggleTodo={toggleTodo}
-            />
-          )
-        })}
-      </div>
-      </div>
-    </div>
-  )
+   )
 }
 
 export default App
