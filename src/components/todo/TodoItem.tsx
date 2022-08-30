@@ -1,5 +1,6 @@
 import './Todo.css'
 import {useState} from "react";
+import { TodoTimestamp } from '../TodoTimestamp/TodoTimestamp';
 
 
 export type Todo = {
@@ -8,6 +9,11 @@ export type Todo = {
   isCompleted: boolean
   createdAt: Date
 }
+export type LocalTodo = Omit<Todo, "createdAt"> & {
+createdAt: string
+}
+   
+
 
 type TodoProps = {
   todo: Todo
@@ -20,11 +26,11 @@ type TodoProps = {
 
 export function TodoItem({ todo, index, removeTodo, enterEditMode, toggleTodo }: TodoProps) {
   return (
-    <div className="todo-item" key={`${todo.createdAt.getMilliseconds()}-${todo.title}`}>
+    <div className="todo-item">
       <div className={`todo-content ${todo.isCompleted ? "is-completed" : ""}`} onClick={() => toggleTodo(index, !todo.isCompleted)}>
         <div className="todo-title">{todo.title}</div>
         <div className="todo-description">{todo.description}</div>
-        <div className="todo-created-at">{`${todo.createdAt.getDate()}.${todo.createdAt.getMonth()}.${todo.createdAt.getFullYear()}`}</div>
+        <div className="todo-created-at"><TodoTimestamp todo={todo} /></div>
       </div>
       <div className="todo-controls">
         <div

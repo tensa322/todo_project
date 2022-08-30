@@ -1,5 +1,6 @@
 import './TodoForm.css'
 import {ActiveTodo} from "../../App";
+import { KeyboardEvent } from 'react';
 
 export type TodoPayload = {
   title: string
@@ -13,9 +14,12 @@ type TodoFormProps = {
   setTodoForm: (payload: TodoPayload) => void
   submitTodo: () => void
   clearForm: () => void
+  onKeyDown: (e:KeyboardEvent<HTMLInputElement>) => void
 }
 
-export function TodoForm({ todoForm, activeTodo, setActiveTodo, clearForm, submitTodo, setTodoForm }: TodoFormProps) {
+
+
+export function TodoForm({ todoForm, activeTodo, setActiveTodo, clearForm, submitTodo, setTodoForm, onKeyDown}: TodoFormProps) {
   return (
     <div className="create-todo">
       <input
@@ -26,6 +30,8 @@ export function TodoForm({ todoForm, activeTodo, setActiveTodo, clearForm, submi
         placeholder="Введите заголовок"
         type="text"
         value={todoForm.title}
+        onKeyDown={onKeyDown}
+        
       />
       <input
         onChange={(e) => setTodoForm({
@@ -35,6 +41,8 @@ export function TodoForm({ todoForm, activeTodo, setActiveTodo, clearForm, submi
         placeholder="Введите описание"
         type="text"
         value={todoForm.description}
+        onKeyDown={onKeyDown}
+        
       />
       <button
         disabled={Boolean(!todoForm.title.length || !todoForm.description.length)}

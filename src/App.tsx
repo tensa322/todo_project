@@ -1,7 +1,10 @@
 import { useState, useEffect, KeyboardEvent } from 'react'
 import './App.css'
-import { Todo, TodoItem } from "./components/todo/TodoItem";
+import { Todo, TodoItem, LocalTodo } from "./components/todo/TodoItem";
 import { TodoForm, TodoPayload } from "./components/todo-form/TodoForm";
+import { TodoList } from './components/todo-list/TodoList';
+import { formatRelative } from 'date-fns';
+import { ru } from 'date-fns/locale'
 
 export type ActiveTodo = number | null
 
@@ -22,18 +25,25 @@ function App() {
       },
       {
          title: 'Зал',
-         description: 'Сегодня день ног, не вздумай проебать',
+         description: 'Сегодня день ног, не вздумай пропустить',
          isCompleted: false,
          createdAt: new Date()
       },
    ])
    
-   // useEffect(() => {
-   //    if (localStorage.getItem('localtasks')) {
-   //       const storedList = JSON.parse(localStorage.getItem('localtasks')!);
-   //       setTodos(storedList)
-   //    }
-   // }, [])
+   useEffect(() => {
+      if (localStorage.getItem('localtasks')) {
+         
+         const storedList = JSON.parse(localStorage.getItem('localtasks') as string) as LocalTodo[]
+         const formattedTodos = storedList.map(todo =>{
+            return {...todo, createdAt: new Date(todo.createdAt)}
+         }) 
+         setTodos(formattedTodos)
+      
+      }
+   }, [])
+
+
 
    function clearForm() {
       setTodoForm({
@@ -41,6 +51,14 @@ function App() {
          description: ''
       })
    }
+
+   function syncLocalStorage (updatedTodos:Todo[]) {
+      const formattedTodos = updatedTodos.map(todo =>{
+         return {...todo, createdAt: todo.createdAt.getTime()}
+      }) 
+      localStorage.setItem('localtasks', JSON.stringify(formattedTodos))
+   }
+
 
    function createTodo(todoForm: TodoPayload) {
       const newTodo: Todo = {
@@ -50,13 +68,19 @@ function App() {
       }
 
       setTodos([
-         ...todos,
-         newTodo
+         newTodo,
+         ...todos
+         
       ])
 
       clearForm()
-      // localStorage.setItem('localtasks', JSON.stringify([...todos, newTodo]))
-      // setTodos([])
+      syncLocalStorage([
+         newTodo,
+         ...todos
+         
+      ])
+
+
    }
 
    function updateTodo(todoForm: TodoPayload) {
@@ -76,6 +100,7 @@ function App() {
 
          setActiveTodo(null)
          clearForm()
+         syncLocalStorage(updatedTodos)
       }
    }
 
@@ -85,7 +110,7 @@ function App() {
       })
 
       setTodos(newTodos)
-      // localStorage.setItem('localtasks', JSON.stringify(newTodos))
+      syncLocalStorage(newTodos)
    }
 
 
@@ -111,19 +136,15 @@ function App() {
       const todosCopy = [...todos]
       todosCopy[index] = updatedTodo
       setTodos(todosCopy)
-   }
-
-   function completedTodos() {
-      return todos.filter(todo => todo.isCompleted)
-   }
-   function incompletedTodos() {
-      return todos.filter(todo => !todo.isCompleted)
+      syncLocalStorage(todosCopy)
    }
 
    const onKeyDown = (e:KeyboardEvent<HTMLInputElement>) => {
     if (e.keyCode === 13)
    return submitTodo()
    }
+
+   
 
    return (
       <div className="App">
@@ -135,35 +156,17 @@ function App() {
             submitTodo={submitTodo}
             clearForm={clearForm}
             onKeyDown={onKeyDown}
-
+            
          />
          <div className='todo-list-container'>
-            <div className="todo-list">
-               {incompletedTodos().map((todo, index) => {
-                  return (
-                     <TodoItem
-                        todo={todo}
-                        index={index}
-                        removeTodo={removeTodo}
-                        enterEditMode={enterEditMode}
-                        toggleTodo={toggleTodo}
-                     />
-                  )
-               })}
-            </div>
-            <div className="todo-list">
-               {completedTodos().map((todo, index) => {
-                  return (
-                     <TodoItem
-                        todo={todo}
-                        index={index}
-                        removeTodo={removeTodo}
-                        enterEditMode={enterEditMode}
-                        toggleTodo={toggleTodo}
-                     />
-                  )
-               })}
-            </div>
+            <TodoList 
+            todos={todos}
+            removeTodo={removeTodo}
+            enterEditMode={enterEditMode}
+            toggleTodo={toggleTodo}
+
+            />
+           
          </div>
       </div>
    )

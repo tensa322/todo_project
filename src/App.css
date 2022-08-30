@@ -4,8 +4,11 @@
   padding: 2rem;
   display: flex;
   justify-content: center;
+  
 }
-
+body {
+   background-color:#292929;
+}
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -41,16 +44,9 @@
   color: #888;
 }
 
-/*TODO LIST*/
-.todo-list {
-  display: flex;
-  flex-direction: column;
-  row-gap: 12px;
-}
 
-.strike {
-   text-decoration: line-through;
-}
+
+
 .todo-list-container {
    display: flex;
 }
